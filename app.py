@@ -10,6 +10,7 @@ import logging
 import sys
 import psutil
 import gc
+import urllib.request
 
 
 # Configure logging
@@ -28,23 +29,25 @@ def load_model():
     """Load YOLO model with memory management and error handling"""
     try:
         logger.info("Starting model load")
-        logger.info(f"Available memory before model load: {psutil.Process().memory_info().rss / 1024 / 1024:.2f} MB")
         
-        # Clear any existing cached data
-        torch.cuda.empty_cache() if torch.cuda.is_available() else None
-        gc.collect()
+        # Verificar si el modelo existe, si no, descargarlo
+        model_path = "yolov8n.pt"
+        if not os.path.exists(model_path):
+            logger.info("Downloading YOLOv8n model...")
+            url = "https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.pt"
+            urllib.request.urlretrieve(url, model_path)
+            logger.info("Model downloaded successfully")
         
         # Optimizar para inferencia
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        model = YOLO("yolov8n.pt")
+        model = YOLO(model_path)
         model.to(device)
         
         # Configurar para inferencia
         if device == "cuda":
-            model.fuse()  # Fusionar capas para mejor rendimiento
+            model.fuse()
         
         logger.info("Model loaded successfully")
-        logger.info(f"Available memory after model load: {psutil.Process().memory_info().rss / 1024 / 1024:.2f} MB")
         return model
     except Exception as e:
         logger.error(f"Error loading model: {str(e)}", exc_info=True)
