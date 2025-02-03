@@ -1,0 +1,13 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+restartPolicy = "always"
+healthcheckPath = "/_stcore/health"
+healthcheckTimeout = 300
+startupTimeout = 300
+
+[deploy.env]
+STREAMLIT_SERVER_HEADLESS = "true"
+STREAMLIT_BROWSER_GATHER_USAGE_STATS = "false"
