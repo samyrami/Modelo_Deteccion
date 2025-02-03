@@ -31,13 +31,17 @@ ENV LC_ALL=C.UTF-8 \
     PYTHONUNBUFFERED=1 \
     STREAMLIT_SERVER_HEADLESS=true \
     STREAMLIT_SERVER_PORT=8501 \
-    STREAMLIT_SERVER_ADDRESS=0.0.0.0
+    STREAMLIT_SERVER_ADDRESS=0.0.0.0 \
+    STREAMLIT_SERVER_ENABLE_CORS=true
 
 # Reduce memory usage
 ENV PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:32 \
     MALLOC_TRIM_THRESHOLD_=100000 \
     OMP_NUM_THREADS=1 \
     MKL_NUM_THREADS=1
+
+# Create directory for model
+RUN mkdir -p /app/models
 
 # Expose port
 EXPOSE 8501
@@ -46,5 +50,12 @@ EXPOSE 8501
 HEALTHCHECK --interval=30s --timeout=30s --start-period=60s --retries=3 \
   CMD curl --fail http://localhost:8501/_stcore/health || exit 1
 
-# Start command
-CMD ["streamlit", "run", "app.py", "--server.address", "0.0.0.0", "--server.port", "8501"]
+# Start command with increased timeout and memory settings
+CMD ["streamlit", "run", "app.py", \
+     "--server.address", "0.0.0.0", \
+     "--server.port", "8501", \
+     "--server.maxUploadSize", "200", \
+     "--server.enableCORS", "true", \
+     "--server.enableXsrfProtection", "false", \
+     "--browser.serverAddress", "0.0.0.0", \
+     "--browser.serverPort", "8501"]

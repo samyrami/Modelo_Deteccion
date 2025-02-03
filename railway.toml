@@ -3,7 +3,7 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-restartPolicy = "ON_FAILURE"
+restartPolicy = "ALWAYS"
 healthcheckPath = "/_stcore/health"
 healthcheckTimeout = 300
 startupTimeout = 300
@@ -13,3 +13,5 @@ numReplicas = 1
 STREAMLIT_SERVER_HEADLESS = "true"
 STREAMLIT_BROWSER_GATHER_USAGE_STATS = "false"
 PORT = "8501"
+STREAMLIT_SERVER_ENABLE_CORS = "true"
+STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION = "false"
